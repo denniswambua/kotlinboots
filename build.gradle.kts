@@ -1,6 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.palantir.gradle.docker.DockerExtension
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.kotlin.dsl.*
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 
@@ -8,7 +7,6 @@ plugins {
 	id("org.springframework.boot") version "2.1.9.RELEASE"
 	id("io.spring.dependency-management") version "1.0.8.RELEASE"
 	id("com.palantir.docker") version "0.22.1"
-	id("com.github.johnrengelman.shadow") version "5.1.0"
 	kotlin("jvm") version "1.2.71"
 	kotlin("plugin.spring") version "1.2.71"
 	kotlin("plugin.jpa") version "1.2.71"
@@ -67,9 +65,7 @@ allOpen{
 	annotations("javax.persistence.MappedSuperclass")
 }
 
-val build: DefaultTask by tasks
-val shadowJar = tasks["shadowJar"] as ShadowJar
-build.dependsOn(shadowJar)
+
 val bootJar = tasks["bootJar"] as BootJar
 
 configure<DockerExtension> {
@@ -81,14 +77,4 @@ configure<DockerExtension> {
 	))
 	pull(true)
 	dependsOn(bootJar, tasks["jar"])
-}
-
-tasks {
-	named<ShadowJar>("shadowJar") {
-		archiveBaseName.set("app")
-		mergeServiceFiles()
-		manifest {
-			attributes(mapOf("Main-Class" to "com.example.books.BooksApplicationKt"))
-		}
-	}
 }
